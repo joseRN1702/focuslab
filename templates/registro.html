@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="static/registro.css">
+    <link rel="icon" href="/static/img/favicon/favicon.ico">
+</head>
+<body>
+    <h1>Registrar</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+    <form action="/registro" id="registro" method="POST">
+        <label for="nome">Primeiro nome</label>
+        <input type="text" name="primeiro_nome" id="primeiro_nome" required placeholder="Digite seu primeiro nome"> <br> <br>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" required placeholder="Digite seu Email"><br> <br>
+        <label for="senha">Senha</label>
+        <input type="password" name="senha" id="senha" required placeholder="Digite sua Senha" minlength="6"><br> <br>
+        <label for="senha">Senha</label>
+        <input type="password" name="confirmar_senha" id="confirmar_senha" required placeholder="Confirme sua Senha" minlength="6"><br><br>
+        <button type="submit">Registrar</button>
+        <p>Ja tem uma conta? <a href="{{ url_for('login') }}">Faça Login</a></p>
+    </form>
+</body>
+</html>

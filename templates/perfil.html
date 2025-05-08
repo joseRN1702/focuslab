@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil</title>
+    <link rel="stylesheet" href="static/perfil.css">
+    <link rel="icon" href="/static/img/favicon/favicon.ico">
+</head>
+<body>
+    {% if user.profile_pic %}
+    {% if user.profile_pic in ['default1.png', 'default2.png', 'default3.png', 'default4.png', 'default5.png', 'default6.png', 'default7.png', 'default8.png', 'default9.png', 'default10.png'] %}
+        <img src="{{ url_for('static', filename='img/profile_pics/' + user.profile_pic) }}" alt="Foto de Perfil" style="width: 100px; height: 100px; border-radius: 50%;">
+    {% else %}
+        <img src="{{ url_for('static', filename='img/users_profile_pics/' + user.profile_pic) }}" alt="Foto de Perfil" style="width: 100px; height: 100px; border-radius: 50%;">
+    {% endif %}
+{% else %}
+    <p>Nenhuma foto de perfil.</p>
+{% endif %}
+    <p><strong>Nome:</strong> {{ user.first_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+
+    <a href="{{ url_for('logout') }}"><button>Deslogar</button></a>
+
+    <h2>Editar Nome</h2>
+    <form method="POST" action="/perfil">
+        <div>
+            <label for="nome">Novo Nome:</label>
+            <input type="text" id="nome" name="nome" value="{{ user.first_name }}" required><br><br>
+        </div>
+        <button type="submit">Salvar Nome</button>
+    </form>
+
+    <h2>Editar Foto de Perfil</h2>
+    <form method="POST" action="/atualizar_foto" enctype="multipart/form-data">
+        <div>
+            <label for="profile_pic">Nova Foto de Perfil:</label>
+            <input type="file" id="profile_pic" name="nova_foto"><br><br>
+        </div>
+        <button type="submit">Salvar Foto</button>
+    </form>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flashes">
+      {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+</body>
+</html>
