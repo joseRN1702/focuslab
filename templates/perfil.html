@@ -9,7 +9,7 @@
 </head>
 <body>
     {% if user.profile_pic %}
-    {% if user.profile_pic in ['default1.png', 'default2.png', 'default3.png', 'default4.png', 'default5.png', 'default6.png', 'default7.png', 'default8.png', 'default9.png', 'default10.png'] %}
+    {% if user.profile_pic in ['profile1.png', 'profile2.png', 'profile3.png', 'profile4.png', 'profile5.png', 'profile6.png', 'profile7.png', 'profile8.png', 'profile9.png', 'profile10.png'] %}
         <img src="{{ url_for('static', filename='img/profile_pics/' + user.profile_pic) }}" alt="Foto de Perfil" style="width: 100px; height: 100px; border-radius: 50%;">
     {% else %}
         <img src="{{ url_for('static', filename='img/users_profile_pics/' + user.profile_pic) }}" alt="Foto de Perfil" style="width: 100px; height: 100px; border-radius: 50%;">

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda {{ ano }}</title>
+</head>
+<body>
+    <h1>Agenda {{ ano }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% for mes_num, semanas in calendario.items() %}
+        <h2>{{ meses[mes_num - 1] }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    {% for dia_semana in dias_semana %}
+                        <th>{{ dia_semana }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for semana in semanas %}
+                    <tr>
+                        {% for dia, dia_semana_num in semana %}
+                            <td>
+                                {% if dia != 0 %}
+                                    {% set data_link = '%02d-%02d-%s' % (dia, mes_num, ano) %}
+                                    <a href="{{ url_for('dashboard_dia_url', data='%02d-%02d-%s' % (dia, mes_num, ano)) }}">{{ dia }}</a>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+    {% endfor %}
+
+    <a href="{{ url_for('perfil') }}">Voltar ao Perfil</a>
+    <a href="{{ url_for('logout') }}">Deslogar</a>
+</body>
+</html>

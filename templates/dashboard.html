@@ -3,13 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/dashboard.css">
+    <title>Dashboard{% if data_filtrada %} - {{ data_filtrada }}{% endif %}</title>
+</head>
     <link rel="icon" href="/static/img/favicon/favicon.ico">
 </head>
 <body>
-    <H1>Bem-Vindo</H1>
-    <a href="{{url_for('logout')}}"><button>Sair da conta</button></a>
-    <a href="{{url_for('perfil')}}"><button>Perfil</button></a>
+    <h1>Dashboard{% if data_filtrada %} - {{ data_filtrada }}{% endif %}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if data_filtrada %}
+        <h2>Notas para {{ data_filtrada }}</h2>
+        <form method="POST" action="{{ url_for('salvar_nota') }}">
+            <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
+            <textarea name="content" rows="5" cols="50">{{ nota.content if nota else '' }}</textarea><br>
+            <button type="submit">Salvar Nota</button>
+        </form>
+
+        <h2>Tarefas para {{ data_filtrada }}</h2>
+        <ul>
+            {% for tarefa in tarefas %}
+                <li>{{ tarefa.name }} - {% if tarefa.done %}Feito{% else %}Pendente{% endif %}</li>
+            {% else %}
+                <li>Nenhuma tarefa para hoje.</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Adicionar Nova Tarefa</h3>
+        <form method="POST" action="{{ url_for('adicionar_tarefa') }}">
+            <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
+            <input type="text" name="nome_tarefa" placeholder="Nome da tarefa">
+            <button type="submit">Adicionar Tarefa</button>
+        </form>
+
+    {% else %}
+        <p>Bem-vindo ao seu dashboard!</p>
+    {% endif %}
+
+    <a href="{{ url_for('agenda') }}"><button>Agenda</button></a>
+    <a href="{{ url_for('perfil') }}"><button>Perfil</button></a>
+    <a href="{{ url_for('logout') }}"><button>Deslogar</button></a>
+
 </body>
 </html>
