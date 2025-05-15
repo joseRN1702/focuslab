@@ -119,6 +119,7 @@ def logout():
 def perfil():
     user_id = session.get('user_id')
     user = User.query.get_or_404(user_id)
+    now = datetime.datetime.now()
     if request.method=='POST':
         new_name=request.form.get('nome')
         if  len(new_name.split()) > 1:
@@ -129,7 +130,7 @@ def perfil():
             db.session.commit()
             flash('Nome atualizado com sucesso!', 'success')
             return render_template('perfil.html', user=user)
-    return render_template('perfil.html', user=user)
+    return render_template('perfil.html', user=user, now=now)
 
 @app.route('/atualizar_foto', methods=['POST'])
 @login_required
@@ -211,6 +212,7 @@ def adicionar_tarefa():
     user_id = session.get('user_id')
     nome_tarefa = request.form.get('nome_tarefa')
     data_str = request.form.get('data')
+    cor_tarefa = request.form.get('cor_tarefa')
 
     if not nome_tarefa:
         flash('O nome da tarefa não pode estar vazio.', 'error')
@@ -227,12 +229,28 @@ def adicionar_tarefa():
         flash('Erro ao adicionar tarefa: formato de data inválido.', 'error')
         return redirect(request.referrer)
 
-    nova_tarefa = Task(name=nome_tarefa, date=data_tarefa, user_id=user_id)
+    nova_tarefa = Task(name=nome_tarefa, date=data_tarefa, user_id=user_id, color=cor_tarefa)
     db.session.add(nova_tarefa)
     db.session.commit()
     flash('Tarefa adicionada com sucesso!', 'success')
 
     return redirect(request.referrer)
+
+@app.route('/toggle_tarefa/<int:tarefa_id>', methods=['POST'], endpoint='toggle_tarefa')
+@login_required
+def toggle_tarefa(tarefa_id):
+    tarefa = Task.query.get_or_404(tarefa_id)
+    if tarefa.user_id != session.get('user_id'):
+        flash('Você não tem permissão para alterar esta tarefa.', 'error')
+        return redirect(request.referrer)
+    tarefa.done = not tarefa.done
+    db.session.commit()
+    return redirect(request.referrer)
+
+@app.route('/grupos')
+@login_required
+def grupos():
+    return render_template('grupos.html')
 
 if __name__ == '__main__':
     with app.app_context():

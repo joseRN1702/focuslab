@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard{% if data_filtrada %} - {{ data_filtrada }}{% endif %}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
 </head>
     <link rel="icon" href="/static/img/favicon/favicon.ico">
+        <style>
+    </style>
 </head>
 <body>
     <h1>Dashboard{% if data_filtrada %} - {{ data_filtrada }}{% endif %}</h1>
@@ -20,37 +23,48 @@
       {% endif %}
     {% endwith %}
 
-    {% if data_filtrada %}
-        <h2>Notas para {{ data_filtrada }}</h2>
-        <form method="POST" action="{{ url_for('salvar_nota') }}">
-            <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
-            <textarea name="content" rows="5" cols="50">{{ nota.content if nota else '' }}</textarea><br>
-            <button type="submit">Salvar Nota</button>
-        </form>
+    <h2>Notas para {{ data_filtrada }}</h2>
+    <form method="POST" action="{{ url_for('salvar_nota') }}">
+        <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
+        <textarea name="content" rows="5" cols="50">{{ nota.content if nota else '' }}</textarea><br>
+        <button type="submit">Salvar Nota</button>
+    </form>
 
-        <h2>Tarefas para {{ data_filtrada }}</h2>
-        <ul>
-            {% for tarefa in tarefas %}
-                <li>{{ tarefa.name }} - {% if tarefa.done %}Feito{% else %}Pendente{% endif %}</li>
-            {% else %}
-                <li>Nenhuma tarefa para hoje.</li>
-            {% endfor %}
-        </ul>
+    <h2>Tarefas para {{ data_filtrada }}</h2>
+    <ul>
+        {% for tarefa in tarefas %}
+            <li {% if tarefa.color %}style="color: {{ tarefa.color }};"{% endif %}>
+                <form method="POST" action="{{ url_for('toggle_tarefa', tarefa_id=tarefa.id) }}" style="display: inline;">
+                    <input type="checkbox" name="done" value="True" {% if tarefa.done %}checked{% endif %} onchange="this.form.submit()">
+                </form>
+                <span {% if tarefa.done %}class="task-done"{% endif %}>{{ tarefa.name }}</span>
+            </li>
+        {% else %}
+            <li>Nenhuma tarefa para hoje.</li>
+        {% endfor %}
+    </ul>
 
-        <h3>Adicionar Nova Tarefa</h3>
-        <form method="POST" action="{{ url_for('adicionar_tarefa') }}">
-            <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
-            <input type="text" name="nome_tarefa" placeholder="Nome da tarefa">
-            <button type="submit">Adicionar Tarefa</button>
-        </form>
+    <h3>Adicionar Nova Tarefa</h3>
+    <form method="POST" action="{{ url_for('adicionar_tarefa') }}">
+        <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
+        <input type="text" name="nome_tarefa" placeholder="Nome da tarefa">
+        <label for="cor_tarefa">Cor:</label>
+        <select name="cor_tarefa" id="cor_tarefa">
+            <option value="">Padrão</option>
+            <option value="red">Vermelho</option>
+            <option value="green">Verde</option>
+            <option value="blue">Azul</option>
+            <option value="orange">Laranja</option>
+            <option value="purple">Roxo</option>
+        </select>
+        <button type="submit">Adicionar Tarefa</button>
+    </form>
 
-    {% else %}
-        <p>Bem-vindo ao seu dashboard!</p>
-    {% endif %}
-
-    <a href="{{ url_for('agenda') }}"><button>Agenda</button></a>
-    <a href="{{ url_for('perfil') }}"><button>Perfil</button></a>
-    <a href="{{ url_for('logout') }}"><button>Deslogar</button></a>
+    <br>
+    <a href="{{ url_for('agenda') }}" class="button-link"><Button>Agenda</Button></a>
+    <a href="{{ url_for('perfil') }}" class="button-link"><Button>Perfil</Button></a>
+    <a href="{{ url_for('grupos') }}" class="button-link"><Button>Grupos</Button></a> 
+    <a href="{{ url_for('logout') }}" class="button-link"><button>Sair</button></a>
 
 </body>
 </html>

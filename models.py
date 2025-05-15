@@ -45,6 +45,7 @@ class Task(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.datetime.now(pytz.timezone('America/Sao_Paulo')))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.datetime.now(pytz.timezone('America/Sao_Paulo')), onupdate=lambda: datetime.datetime.now(pytz.timezone('America/Sao_Paulo')))
+    color = db.Column(db.String(20), nullable=True)
 
     def __repr__(self):
         return f'<Task id={self.id} name={self.name} done={self.done} date={self.date} user={self.user_id}>'

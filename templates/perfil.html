@@ -48,5 +48,6 @@
       </ul>
     {% endif %}
   {% endwith %}
+  <a href="{{ url_for('dashboard_dia_url', data=data_filtrada if data_filtrada else '%02d-%02d-%s' % (now.day, now.month, now.year)) }}" class="button-link"><button>Voltar</button></a>
 </body>
 </html>
