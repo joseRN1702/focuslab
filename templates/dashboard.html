@@ -3,68 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard{% if data_filtrada %} - {{ data_filtrada }}{% endif %}</title>
+    <title>Dashboard{% if data_exibicao %} - {{ data_exibicao }}{% endif %} - Focus Lab</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/favicon/favicon.ico') }}">
 </head>
-    <link rel="icon" href="/static/img/favicon/favicon.ico">
-        <style>
-    </style>
-</head>
-<body>
-    <h1>Dashboard{% if data_filtrada %} - {{ data_filtrada }}{% endif %}</h1>
+<body class="page-dashboard-v6">
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class="flashes">
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <header class="site-header-v6 simple-header">
+        <div class="header-container-v6">
+            <div class="header-left-v6">
+                <a href="{{ url_for('home') }}" class="site-logo-link-header-v6">
+                    <img src="{{ url_for('static', filename='imgs/logos/logo.png') }}" alt="Focus Lab Logo" class="header-logo-img-v6">
+                </a>
+            </div>
+            <div class="header-center-v6">
+                <h1 class="page-title-header-v6">Dashboard{% if data_exibicao %} - {{ data_exibicao }}{% endif %}</h1>
+            </div>
+            <div class="header-right-v6">
+                <nav class="main-navigation-v6">
+                    <a href="{{ url_for('perfil') }}" class="btn-header-action-v6 btn-perfil-v6">Perfil</a>
+                </nav>
+            </div>
+        </div>
+    </header>
 
-    <h2>Notas para {{ data_filtrada }}</h2>
-    <form method="POST" action="{{ url_for('salvar_nota') }}">
-        <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
-        <textarea name="content" rows="5" cols="50">{{ nota.content if nota else '' }}</textarea><br>
-        <button type="submit">Salvar Nota</button>
-    </form>
+    <main class="dashboard-wrapper-v6">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes-v6">
+          {% for category, message in messages %}
+            <li class="flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
 
-    <h2>Tarefas para {{ data_filtrada }}</h2>
-    <ul>
-        {% for tarefa in tarefas %}
-            <li {% if tarefa.color %}style="color: {{ tarefa.color }};"{% endif %}>
-                <form method="POST" action="{{ url_for('toggle_tarefa', tarefa_id=tarefa.id) }}" style="display: inline;">
-                    <input type="checkbox" name="done" value="True" {% if tarefa.done %}checked{% endif %} onchange="this.form.submit()">
-                </form>
-                <span {% if tarefa.done %}class="task-done"{% endif %}>{{ tarefa.name }}</span>
-            </li>
-        {% else %}
-            <li>Nenhuma tarefa para hoje.</li>
-        {% endfor %}
-    </ul>
+        <div class="dashboard-grid-v6">
+            <section class="notes-section-v6 card-style-v6">
+                <div class="card-header-v6">
+                    <h2>Notas para {{ data_exibicao if data_exibicao is defined else 'Hoje' }}</h2>
+                </div>
+                <div class="card-body-v6">
+                    <form method="POST" action="{{ url_for('salvar_nota') }}" class="form-layout-v6">
+                        <input type="hidden" name="data" value="{{ data_param_original.split('-')[2] ~ '-' ~ data_param_original.split('-')[1] ~ '-' ~ data_param_original.split('-')[0] if (data_param_original is defined and data_param_original) else (now.strftime('%Y-%m-%d') if now is defined else '') }}">
+                        <div class="form-group-v6">
+                            <label for="note-content" class="sr-only">Conteúdo da Nota</label>
+                            <textarea name="content" id="note-content" rows="7" placeholder="Suas notas e pensamentos do dia...">{{ nota.content if nota else '' }}</textarea>
+                        </div>
+                        <button type="submit" class="btn-v6 btn-submit-v6 btn-full-width-v6">Salvar Nota</button>
+                    </form>
+                </div>
+            </section>
 
-    <h3>Adicionar Nova Tarefa</h3>
-    <form method="POST" action="{{ url_for('adicionar_tarefa') }}">
-        <input type="hidden" name="data" value="{{ data_filtrada.split('/')[2] ~ '-' ~ data_filtrada.split('/')[1] ~ '-' ~ data_filtrada.split('/')[0] }}">
-        <input type="text" name="nome_tarefa" placeholder="Nome da tarefa">
-        <label for="cor_tarefa">Cor:</label>
-        <select name="cor_tarefa" id="cor_tarefa">
-            <option value="">Padrão</option>
-            <option value="red">Vermelho</option>
-            <option value="green">Verde</option>
-            <option value="blue">Azul</option>
-            <option value="orange">Laranja</option>
-            <option value="purple">Roxo</option>
-        </select>
-        <button type="submit">Adicionar Tarefa</button>
-    </form>
+            <section class="tasks-section-v6 card-style-v6">
+                <div class="card-header-v6">
+                    <h2>Tarefas para {{ data_exibicao if data_exibicao is defined else 'Hoje' }}</h2>
+                </div>
+                <div class="card-body-v6">
+                    {% if tarefas %}
+                        <ul class="task-list-v6">
+                        {% for tarefa in tarefas %}
+                            <li class="task-item-v6 {{ 'task-done-v6' if tarefa.done else '' }}">
+                                <div class="task-main-content-v6">
+                                    <form method="POST" action="{{ url_for('toggle_tarefa', tarefa_id=tarefa.id) }}" class="task-toggle-form-v6">
+                                        <input type="checkbox" name="done" id="task-{{ tarefa.id }}" value="True" {% if tarefa.done %}checked{% endif %} onchange="this.form.submit()" class="task-checkbox-v6">
+                                        <label for="task-{{ tarefa.id }}" class="checkbox-custom-label-v6" aria-label="Marcar tarefa como concluída"></label>
+                                    </form>
+                                    {# === PONTO CRÍTICO DA CORREÇÃO === #}
+                                    <span class="task-name-v6"
+                                          {% if tarefa.color and tarefa.color|string|trim != "" and not tarefa.done %}
+                                              style="color: {{ tarefa.color }}; font-weight: 600;" {# ASSEGURE-SE QUE ESTÁ ASSIM NO SEU ARQUIVO #}
+                                          {% endif %}>
+                                        {{ tarefa.name }}
+                                    </span>
+                                    {# === FIM DO PONTO CRÍTICO === #}
+                                </div>
+                                <form method="POST" action="{{ url_for('deletar_tarefa', tarefa_id=tarefa.id) }}" class="task-delete-form-v6">
+                                    <button type="submit" class="btn-delete-task-v6" onclick="return confirm('Tem certeza que deseja deletar esta tarefa?');" aria-label="Deletar tarefa">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM15 4V6H9V4H15Z"></path></svg>
+                                    </button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <div class="empty-state-container-v6">
+                            <svg class="empty-state-icon-v6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="48" height="48"><path d="M20 22H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1Zm-1-2V4H5v16h14ZM8 7h8v2H8V7Zm0 4h8v2H8v-2Zm0 4h5v2H8v-2Z"/></svg>
+                            <p class="empty-state-text-v6">Nenhuma tarefa para este dia. Que tal adicionar uma?</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer-v6 add-task-form-container-v6">
+                    <h3>Adicionar Nova Tarefa</h3>
+                    <form method="POST" action="{{ url_for('adicionar_tarefa') }}" class="form-layout-v6 inline-form-v6">
+                        <input type="hidden" name="data" value="{{ data_param_original.split('-')[2] ~ '-' ~ data_param_original.split('-')[1] ~ '-' ~ data_param_original.split('-')[0] if (data_param_original is defined and data_param_original) else (now.strftime('%Y-%m-%d') if now is defined else '') }}">
+                        <div class="form-group-v6">
+                            <label for="nome_tarefa_input" class="sr-only">Nome da Tarefa</label>
+                            <input type="text" id="nome_tarefa_input" name="nome_tarefa" placeholder="Ex: Reunião de planejamento" required>
+                        </div>
+                        <div class="form-group-v6 task-color-group-v6">
+                            <label for="cor_tarefa_select" class="sr-only">Cor da Tarefa</label>
+                            <select name="cor_tarefa" id="cor_tarefa_select" class="task-color-select-v6">
+                                <option value="">Sem Cor</option>
+                                <option value="red" data-color="red">Vermelho</option>
+                                <option value="green" data-color="green">Verde</option>
+                                <option value="blue" data-color="blue">Azul</option>
+                                <option value="orange" data-color="orange">Laranja</option>
+                                <option value="purple" data-color="purple">Roxo</option>
+                                <option value="#FFC107" data-color="#FFC107">Amarelo</option>
+                                <option value="#00BCD4" data-color="#00BCD4">Ciano</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-v6 btn-submit-v6 btn-icon-v6">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2h6Z"/></svg>
+                            <span>Adicionar</span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
 
-    <br>
-    <a href="{{ url_for('agenda') }}" class="button-link"><Button>Agenda</Button></a>
-    <a href="{{ url_for('perfil') }}" class="button-link"><Button>Perfil</Button></a>
-    <a href="{{ url_for('grupos') }}" class="button-link"><Button>Grupos</Button></a> 
-    <a href="{{ url_for('logout') }}" class="button-link"><button>Sair</button></a>
-
+        <nav class="dashboard-bottom-nav-v6">
+            <a href="{{ url_for('agenda', ano=(data_param_original.split('-')[2] | int) if (data_param_original is defined and data_param_original) else (now.year if now is defined else '') ) }}" class="btn-v6 btn-nav-bottom-v6">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17 3h-1V1h-2v2H10V1H8v2H7c-1.11 0-1.99.9-1.99 2L5 21c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 18H7V8h14v13ZM9 10h2v2H9v-2Zm4 0h2v2h-2v-2Zm-4 4h2v2H9v-2Zm4 0h2v2h-2v-2Z"/></svg>
+                <span>Agenda</span>
+            </a>
+            <a href="{{ url_for('grupos') }}" class="btn-v6 btn-nav-bottom-v6">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3Zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3Zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5Zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5Z"/></svg>
+                <span>Meus Grupos</span>
+            </a>
+        </nav>
+    </main>
 </body>
 </html>

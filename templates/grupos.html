@@ -3,9 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grupos</title>
+    <title>Meus Grupos - Focus Lab</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='grupos.css') }}"> <link rel="icon" href="{{ url_for('static', filename='img/favicon/favicon.ico') }}">
 </head>
-<body>
-    
+<body class="page-grupos">
+
+    <header class="site-header simple-header">
+        <div class="header-container">
+            <div class="header-left">
+                 <a href="{{ url_for('dashboard_dia_url', data=data_filtrada if data_filtrada else '%02d-%02d-%s' % (now.day, now.month, now.year)) }}" class="button-link header-voltar-link">
+    <button type="button" class="btn-header-action">
+        <svg>...</svg>
+        <span>Voltar</span>
+    </button>
+</a>
+            </div>
+            <div class="header-center">
+                <h1 class="page-title-header">Meus Grupos</h1>
+            </div>
+            <div class="header-right">
+                <nav class="main-navigation">
+                    <a href="{{ url_for('perfil') }}" class="btn btn-header-action btn-perfil">Perfil</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="grupos-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+        {% endwith %}
+
+        <section class="group-creation-card card-style">
+            <h2>Criar Novo Grupo</h2>
+            <form method="POST" action="{{ url_for('grupos') }}" class="form-layout">
+                <div class="form-group">
+                    <label for="group_name">Nome do Grupo</label>
+                    <input type="text" id="group_name" name="group_name" required placeholder="Ex: Projeto Alpha">
+                </div>
+                <div class="form-group">
+                    <label for="group_description">Descrição (Opcional)</label>
+                    <textarea id="group_description" name="group_description" rows="3" placeholder="Descreva o objetivo do grupo..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-submit">Criar Grupo</button>
+            </form>
+        </section>
+
+        <section class="groups-list-section">
+            <h2>Grupos que você Gerencia</h2>
+            {% if owned_groups %}
+                <div class="groups-grid">
+                    {% for group in owned_groups %}
+                    <div class="group-card card-style">
+                        <h3>{{ group.name }}</h3>
+                        <p>{{ group.description or 'Sem descrição.' }}</p>
+                        <div class="group-actions">
+                            <a href="{{ url_for('visualizar_grupo', group_id=group.id) }}" class="btn btn-small btn-primary-outline">Ver Grupo</a>
+                            </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Você ainda não criou nenhum grupo.</p>
+            {% endif %}
+        </section>
+
+        <section class="groups-list-section">
+            <h2>Grupos que você Participa</h2>
+            {% if member_groups %}
+                 <div class="groups-grid">
+                    {% for group in member_groups %}
+                    <div class="group-card card-style">
+                        <h3>{{ group.name }}</h3>
+                        <p>{{ group.description or 'Sem descrição.' }}</p>
+                        <p class="group-owner"><em>Proprietário: {{ group.owner.first_name }}</em></p>
+                        <div class="group-actions">
+                             <a href="{{ url_for('visualizar_grupo', group_id=group.id) }}" class="btn btn-small btn-primary-outline">Ver Grupo</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-state">Você não participa de outros grupos no momento.</p>
+            {% endif %}
+        </section>
+    </main>
+
 </body>
 </html>
